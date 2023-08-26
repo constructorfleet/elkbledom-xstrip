@@ -4,7 +4,6 @@ DOMAIN = "elkbledom"
 CONF_RESET = "reset"
 CONF_DELAY = "delay"
 
-
 class EFFECTS (Enum):
     music_flow_flash = 0x0180
     music_flash = 0x0181
@@ -156,6 +155,19 @@ class EFFECTS (Enum):
     fade_62 = 0x8c
     fade_63 = 0x8d
     fade_64 = 0x8e
+    fade_65 = 0xc7
+    fade_66 = 0xc8
+    fade_67 = 0xc9
+    fade_68 = 0xca
+    fade_69 = 0xcb
+    fade_70 = 0xcc
+    fade_71 = 0xcd
+    fade_72 = 0xce
+    fade_73 = 0xcf
+    fade_74 = 0xd0
+    fade_75 = 0xd1
+    fade_76 = 0xd2
+    fade_77 = 0xd3
     chase_action = 0x8f
     chase_action_0 = 0x90
     chase_action_1 = 0x91
@@ -212,19 +224,6 @@ class EFFECTS (Enum):
     flash_rgb_2 = 0xc4
     flash_rgb_3 = 0xc5
     flash_rgb_4 = 0xc6
-    fade = 0xc7
-    fade_0 = 0xc8
-    fade_1 = 0xc9
-    fade_2 = 0xca
-    fade_3 = 0xcb
-    fade_4 = 0xcc
-    fade_5 = 0xcd
-    fade_6 = 0xce
-    fade_7 = 0xcf
-    fade_8 = 0xd0
-    fade_9 = 0xd1
-    fade_10 = 0xd2
-    fade_11 = 0xd3
     party_flash = 0xd4
     fade_bottom = 0xd5
     pulse = 0xd6
@@ -248,7 +247,6 @@ class EFFECTS (Enum):
 
 EFFECTS_list = [e.name for e in EFFECTS]
 
-
 class WEEK_DAYS (Enum):
     monday = 0x01
     tuesday = 0x02
@@ -261,5 +259,3 @@ class WEEK_DAYS (Enum):
     week_days = (0x01 + 0x02 + 0x04 + 0x08 + 0x10)
     weekend_days = (0x20 + 0x40)
     none = 0x00
-
-# print(EFFECTS.blink_red.value)
