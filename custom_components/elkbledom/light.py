@@ -29,19 +29,23 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_MAC): cv.string
 })
 
+
 async def async_setup_entry(hass, config_entry, async_add_devices):
     instance = hass.data[DOMAIN][config_entry.entry_id]
     await instance.update()
-    async_add_devices([BLEDOMLight(instance, config_entry.data["name"], config_entry.entry_id)])
+    async_add_devices(
+        [BLEDOMLight(instance, config_entry.data["name"], config_entry.entry_id)])
     # config_entry.async_on_unload(
     #     await instance.stop()
     # )
+
 
 class BLEDOMLight(LightEntity):
     def __init__(self, bledomInstance: BLEDOMInstance, name: str, entry_id: str) -> None:
         self._instance = bledomInstance
         self._entry_id = entry_id
-        self._attr_supported_color_modes = {ColorMode.RGB, ColorMode.COLOR_TEMP, ColorMode.WHITE}
+        self._attr_supported_color_modes = {
+            ColorMode.RGB, ColorMode.COLOR_TEMP, ColorMode.WHITE}
         self._attr_supported_features = LightEntityFeature.EFFECT
         self._color_mode = ColorMode.WHITE
         self._attr_name = name
@@ -116,7 +120,8 @@ class BLEDOMLight(LightEntity):
                 (DOMAIN, self._instance.address)
             },
             name=self.name,
-            connections={(device_registry.CONNECTION_NETWORK_MAC, self._instance.address)},
+            connections={(device_registry.CONNECTION_NETWORK_MAC,
+                          self._instance.address)},
         )
 
     @property
@@ -134,7 +139,8 @@ class BLEDOMLight(LightEntity):
         if not self.is_on:
             await self._instance.turn_on()
             if self._instance.reset:
-                LOGGER.debug("Change color to white to reset led strip when other infrared control interact")
+                LOGGER.debug(
+                    "Change color to white to reset led strip when other infrared control interact")
                 await self._instance.set_color(self._transform_color_brightness((255, 255, 255), 250))
 
         if ATTR_BRIGHTNESS in kwargs and kwargs[ATTR_BRIGHTNESS] != self.brightness and self.rgb_color != None:
@@ -157,9 +163,11 @@ class BLEDOMLight(LightEntity):
             if kwargs[ATTR_RGB_COLOR] != self.rgb_color:
                 color = kwargs[ATTR_RGB_COLOR]
                 if ATTR_BRIGHTNESS in kwargs:
-                    color = self._transform_color_brightness(color, kwargs[ATTR_BRIGHTNESS])
+                    color = self._transform_color_brightness(
+                        color, kwargs[ATTR_BRIGHTNESS])
                 else:
-                    color = self._transform_color_brightness(color, self.brightness)
+                    color = self._transform_color_brightness(
+                        color, self.brightness)
                 self._effect = None
                 await self._instance.set_color(color)
 

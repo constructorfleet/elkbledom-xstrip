@@ -22,6 +22,7 @@ DATA_SCHEMA = vol.Schema({("host"): str})
 
 MANUAL_MAC = "manual"
 
+
 class BLEDOMFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_POLL
@@ -38,7 +39,8 @@ class BLEDOMFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         self, discovery_info: BluetoothServiceInfoBleak
     ) -> FlowResult:
         """Handle the bluetooth discovery step."""
-        LOGGER.debug("Discovered bluetooth devices, step bluetooth, : %s , %s", discovery_info.address, discovery_info.name)
+        LOGGER.debug("Discovered bluetooth devices, step bluetooth, : %s , %s",
+                     discovery_info.address, discovery_info.name)
         await self.async_set_unique_id(discovery_info.address)
         self._abort_if_unique_id_configured()
         device = DeviceData(self.hass, discovery_info)
@@ -52,10 +54,11 @@ class BLEDOMFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Confirm discovery."""
-        LOGGER.debug("Discovered bluetooth devices, step bluetooth confirm, : %s", user_input)
+        LOGGER.debug(
+            "Discovered bluetooth devices, step bluetooth confirm, : %s", user_input)
         self._set_confirm_only()
         return await self.async_step_user()
-    
+
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
@@ -76,19 +79,21 @@ class BLEDOMFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 LOGGER.debug("Device %s in current_addresses", (self.mac))
                 continue
             if (device for device in self._discovered_devices if device.address == self.mac) != ([]):
-                LOGGER.debug("Device with address %s in discovered_devices", self.mac)
+                LOGGER.debug(
+                    "Device with address %s in discovered_devices", self.mac)
                 continue
             device = DeviceData(self.hass, discovery_info)
             if device.is_supported:
                 self._discovered_devices.append(device)
-        
+
         if not self._discovered_devices:
             return await self.async_step_manual()
 
         for device in self._discovered_devices:
-            LOGGER.debug("Discovered supported devices: %s - %s - %s", device.name, device.address, device.rssi)
+            LOGGER.debug("Discovered supported devices: %s - %s - %s",
+                         device.name, device.address, device.rssi)
 
-        mac_dict = { dev.address: dev.name for dev in self._discovered_devices }
+        mac_dict = {dev.address: dev.name for dev in self._discovered_devices}
         mac_dict[MANUAL_MAC] = "Manually add a MAC address"
         return self.async_show_form(
             step_id="user", data_schema=vol.Schema(
@@ -105,7 +110,7 @@ class BLEDOMFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 if user_input["flicker"]:
                     return self.async_create_entry(title=self.name, data={CONF_MAC: self.mac, "name": self.name})
                 return self.async_abort(reason="cannot_validate")
-            
+
             if "retry" in user_input and not user_input["retry"]:
                 return self.async_abort(reason="cannot_connect")
 
@@ -118,7 +123,7 @@ class BLEDOMFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                         vol.Required("retry"): bool
                     }
                 ), errors={"base": "connect"})
-        
+
         return self.async_show_form(
             step_id="validate", data_schema=vol.Schema(
                 {
@@ -127,7 +132,7 @@ class BLEDOMFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
             ), errors={})
 
     async def async_step_manual(self, user_input: "dict[str, Any] | None" = None):
-        if user_input is not None:            
+        if user_input is not None:
             self.mac = user_input[CONF_MAC]
             self.name = user_input["name"]
             await self.async_set_unique_id(format_mac(self.mac))
@@ -166,6 +171,7 @@ class BLEDOMFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
     def async_get_options_flow(entry: config_entries.ConfigEntry):
         return OptionsFlowHandler(entry)
 
+
 class OptionsFlowHandler(config_entries.OptionsFlow):
 
     def __init__(self, config_entry):
@@ -175,11 +181,12 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
     async def async_step_init(self, _user_input=None):
         """Manage the options."""
         return await self.async_step_user()
-    
+
     async def async_step_user(self, user_input=None):
         """Handle a flow initialized by the user."""
         errors = {}
-        options = self.config_entry.options or {CONF_RESET: False,CONF_DELAY: 120,}
+        options = self.config_entry.options or {
+            CONF_RESET: False, CONF_DELAY: 120, }
         if user_input is not None:
             return self.async_create_entry(title="", data={CONF_RESET: user_input[CONF_RESET], CONF_DELAY: user_input[CONF_DELAY]})
 
