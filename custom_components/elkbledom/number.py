@@ -30,7 +30,7 @@ async def async_setup_entry(
     instance = hass.data[DOMAIN][config_entry.entry_id]
     await instance.update()
     async_add_entities(
-        [BLEDOMSlider(instance, "Effect Speed", config_entry.entry_id)])
+        [BLEDOMSlider(instance, "Effect Speed", config_entry.entry_id), BLEDOMSlider(instance, "Effect Intensity", config_entry.entry_id)])
 
 
 def retry_bluetooth_connection_error(func: WrapFuncType) -> WrapFuncType:
@@ -80,7 +80,7 @@ class BLEDOMSlider(NumberEntity):
         self._instance = bledomInstance
         self._attr_name = attr_name
         self._attr_unique_id = self._instance.address
-        self._effect_speed = None
+        self._value = None
 
     @property
     def available(self):
@@ -97,7 +97,7 @@ class BLEDOMSlider(NumberEntity):
 
     @property
     def native_value(self) -> int | None:
-        return self._effect_speed
+        return self._value
 
     @property
     def device_info(self):
@@ -116,11 +116,13 @@ class BLEDOMSlider(NumberEntity):
     def entity_info(self):
         NumberEntityDescription(
             key=self.name,
-            native_max_value=255,
+            native_max_value=64,
             native_min_value=0,
         )
 
     async def async_set_native_value(self, value: float) -> None:
-        """Update the current value."""
-        await self._instance.set_effect_speed(int(value))
-        self._effect_speed = value
+        if self.name == "Effect Intensity":
+            await self._instance.set_effect_sensitivity(int(value))
+        else:
+            await self._instance.set_effect_speed(int(value))
+        self._value = int(value)

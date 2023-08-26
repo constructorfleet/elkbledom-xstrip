@@ -295,7 +295,12 @@ class BLEDOMInstance:
 
     @retry_bluetooth_connection_error
     async def set_effect_speed(self, value: int):
-        await self._write([0x7e, 0x00, 0x02, value, 0x00, 0x00, 0x00, 0x00, 0xef])
+        await self._write([0x7e, 0x04, 0x02, value, 0xff, 0xff, 0xff, 0xff, 0xef])
+        self._effect_speed = value
+        
+    @retry_bluetooth_connection_error
+    async def set_effect_sensitivity(self, value: int):
+        await self._write([0x7e, 0x04, 0x06, value, 0xff, 0xff, 0xff, 0xff, 0xef])
         self._effect_speed = value
 
     @retry_bluetooth_connection_error
