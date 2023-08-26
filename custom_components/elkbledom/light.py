@@ -58,13 +58,7 @@ class BLEDOMLight(LightEntity):
 
     @property
     def brightness(self):
-        if self._instance.white_brightness:
-            return self._instance.white_brightness
-
-        if self._instance._rgb_color:
-            return max(self._instance.rgb_color)
-
-        return 250
+        return self._instance.brightness
 
     @property
     def is_on(self) -> Optional[bool]:
