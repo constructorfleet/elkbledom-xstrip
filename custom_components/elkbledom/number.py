@@ -30,7 +30,7 @@ async def async_setup_entry(
     instance = hass.data[DOMAIN][config_entry.entry_id]
     await instance.update()
     async_add_entities(
-        [BLEDOMSlider(instance, "Effect Speed", config_entry.entry_id), BLEDOMSlider(instance, "Effect Intensity", config_entry.entry_id)])
+        [BLEDOMSlider(instance, "Effect Speed", config_entry.entry_id+"_speed"), BLEDOMSlider(instance, "Effect Intensity", config_entry.entry_id+"_intensity")])
 
 
 def retry_bluetooth_connection_error(func: WrapFuncType) -> WrapFuncType:
@@ -79,7 +79,7 @@ class BLEDOMSlider(NumberEntity):
     def __init__(self, bledomInstance: BLEDOMInstance, attr_name: str, entry_id: str) -> None:
         self._instance = bledomInstance
         self._attr_name = attr_name
-        self._attr_unique_id = self._instance.address
+        self._attr_unique_id = entry_id
         self._value = None
 
     @property
