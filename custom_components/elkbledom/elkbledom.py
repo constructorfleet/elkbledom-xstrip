@@ -223,6 +223,7 @@ class BLEDOMInstance:
         self._brightness = None
         self._effect = None
         self._effect_speed = None
+        self._effect_sensitivity = None
         self._color_temp = None
         self._write_uuid = None
         self._read_uuid = None
@@ -301,11 +302,18 @@ class BLEDOMInstance:
     @retry_bluetooth_connection_error
     async def set_effect_sensitivity(self, value: int):
         await self._write([0x7e, 0x04, 0x06, value, 0xff, 0xff, 0xff, 0xff, 0xef])
-        self._effect_speed = value
+        self._effect_sensitivity = value
 
     @retry_bluetooth_connection_error
     async def set_effect(self, value: int):
-        await self._write([0x7e, 0x00, 0x03, value, 0x03, 0x00, 0x00, 0x00, 0xef])
+        if value<256:
+            # basic effects
+            await self._write([0x7e, 0x05, 0x03, value, 0x06, 0xff, 0xff, 0x00, 0xef])
+        else:
+            # music effects
+            # Ignore 0x01 added in const to determine if its a music or basic effect
+            value = value.to_bytes(2,'big')[1] 
+            await self._write([0x7e, 0x07, 0x03, value, 0x04, 0xff, 0xff, 0x00, 0xef])
         self._effect = value
 
     @retry_bluetooth_connection_error
@@ -323,7 +331,7 @@ class BLEDOMInstance:
     @retry_bluetooth_connection_error
     async def set_color(self, rgb: Tuple[int, int, int]):
         r, g, b = rgb
-        await self._write([0x7e, 0x00, 0x05, 0x03, r, g, b, 0x00, 0xef])
+        await self._write([0x7e, 0x07, 0x05, 0x03, r, g, b, 0x10, 0xef])
         self._rgb_color = rgb
 
     @retry_bluetooth_connection_error
